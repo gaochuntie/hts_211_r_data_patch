@@ -97,6 +97,26 @@ void remove_between_commas(vector<string>& vec) {
         }
     }
 }
+// 新增步骤：交换每一行第二个到第三个逗号之间和第三个到第四个逗号之间的数据
+void swap_2nd_3rd_and_3rd_4th_fields(vector<string>& vec) {
+    for (auto& line : vec) {
+        size_t pos1 = line.find(",");
+        if (pos1 == string::npos) continue;
+        size_t pos2 = line.find(",", pos1 + 1);
+        if (pos2 == string::npos) continue;
+        size_t pos3 = line.find(",", pos2 + 1);
+        if (pos3 == string::npos) continue;
+        size_t pos4 = line.find(",", pos3 + 1);
+        if (pos4 == string::npos) continue;
+        // 提取字段
+        string field2 = line.substr(pos1 + 1, pos2 - pos1 - 1);
+        string field3 = line.substr(pos2 + 1, pos3 - pos2 - 1);
+        string field4 = line.substr(pos3 + 1, pos4 - pos3 - 1);
+        // 交换field3和field4
+        string newline = line.substr(0, pos1 + 1) + field2 + "," + field4 + "," + field3 + line.substr(pos4);
+        line = newline;
+    }
+}
 
 // 步骤4+5：合并HVD和NEZ行到上一行
 void merge_HVD_NEZ_to_prev_line(vector<string>& vec) {
@@ -177,6 +197,8 @@ int main() {
     remove_SC_prefix(lines);
     // 步骤8
     remove_between_commas(lines);
+    // 新增步骤：交换字段 全站仪输出的是NEZ（北东高），需要交换为ENZ（东北高）
+    swap_2nd_3rd_and_3rd_4th_fields(lines);
     // 步骤9
     if (write_file("final.dat", lines)) {
         cout << "格式化完成，结果已保存为final.dat。" << endl;
